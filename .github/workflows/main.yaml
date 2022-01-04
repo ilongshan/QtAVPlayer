@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         compiler: ['gcc-9']
+        qt_versions: ["5.15.2", "6.2.0"]
         include:
           - compiler: gcc-9
             packages: gcc-9 g++-9
@@ -38,22 +39,22 @@ jobs:
                                   libva-x11-2 \
                                   libva-drm2
 
-      - name: Install Qt 5.15
+      - name: Install Qt
         uses: jurplel/install-qt-action@v2
         with:
-          version: 5.15.2
+          version: ${{ matrix.qt_versions }}
 
       - name: Build
         run: |
           qmake
-          make -j12 CC=$CC CXX=$CXX
+          make CC=$CC CXX=$CXX
           make install
 
       - name: Test
         run: |
           cd tests/
           qmake
-          make -j12 CC=$CC CXX=$CXX
+          make CC=$CC CXX=$CXX
           export QT_LOGGING_RULES="qt.QtAVPlayer.debug=true"
           cd auto/integration/qavdemuxer
           ./tst_qavdemuxer --platform minimal
